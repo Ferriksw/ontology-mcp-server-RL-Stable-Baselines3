@@ -26,65 +26,80 @@
 ## 📁 目录结构
 
 ```
-ontology-mcp-server/
-├── data/                      # 数据文件
-│   ├── ontology_commerce.ttl # 650行电商领域本体
-│   ├── ontology_shapes.ttl   # 550行 SHACL 校验规则
+ontology-rl-commerce-agent/
+├── README.md                 # 当前文档
+├── pyproject.toml            # Poetry/依赖声明
+├── requirements-dev.txt      # 开发依赖（pytest 等）
+├── train_rl_agent.py         # PPO 训练入口（0→1 训练流程）
+├── test_rl_modules.py        # RL 模块快速自检
+├── scripts/                  # 初始化 & 数据/Agent 工具脚本
+│   ├── run_server.sh         # 启动 MCP 服务器 (FastAPI)
+│   ├── run_agent.sh          # 启动 Gradio UI
+│   ├── init_database.py      # 初始化 12 张业务表
+│   ├── seed_data.py          # 填充基础用户/商品
+│   ├── add_bulk_products.py  # 生成 1000+ 商品
+│   ├── add_bulk_users.py     # 生成 200+ 用户
+│   ├── update_demo_user_names.py # 刷新 Demo 用户信息
+│   └── generate_dialogue_corpus.py # 生成 220 条 RL 语料
+│
+├── data/                     # 数据资产
+│   ├── ontology_commerce.ttl # 650 行电商领域本体
+│   ├── ontology_shapes.ttl   # 550 行 SHACL 校验规则
+│   ├── ontology_rules.ttl    # 业务推理规则
 │   ├── product_synonyms.json # 商品同义词词库
-│   ├── capabilities.jsonld   # 21个工具能力定义
+│   ├── capabilities.jsonld   # 21 个工具能力描述
 │   ├── ecommerce.db          # SQLite 电商数据库
-│   ├── training_scenarios/   # RL 语料（sample_dialogues.json，220条场景）
-│   ├── rl_training/          # RL 训练输出（模型/TensorBoard/检查点）
-│   └── chroma_memory/        # ChromaDB 对话记忆存储
+│   ├── training_scenarios/   # RL 语料 (sample_dialogues.json)
+│   ├── rl_training/          # RL 训练输出（模型/日志/检查点）
+│   └── chroma_memory/        # ChromaDB 对话记忆向量库
 │
-├── src/
-│   ├── ontology_mcp_server/   # MCP Server (FastAPI)
-│   │   ├── server.py          # 主服务 (端口 8000)
-│   │   ├── config.py          # 配置管理
-│   │   ├── capabilities.py    # 工具能力注册
-│   │   ├── tools.py           # 工具调度逻辑
-│   │   ├── ontology_service.py# 本体推理服务
-│   │   ├── shacl_service.py   # SHACL 校验服务
-│   │   ├── commerce_service.py# 电商业务服务
-│   │   ├── db_service.py      # 数据库操作封装
-│   │   ├── models.py          # SQLAlchemy ORM 模型
-│   │   └── ecommerce_ontology.py # 本体推理引擎
-│   │
-│   └── agent/                 # AI Agent (LangChain + Gradio)
-│       ├── gradio_ui.py       # Gradio 可视化界面 (端口 7860)
-│       ├── react_agent.py     # ReAct Agent 实现
-│       ├── mcp_adapter.py     # MCP 工具适配器
-│       ├── llm_deepseek.py    # DeepSeek/OpenAI LLM 集成
-│       ├── prompts.py         # 系统提示词管理
-│       ├── conversation_state.py # 8阶段对话状态跟踪
-│       ├── quality_metrics.py # 对话质量评分
-│       ├── intent_tracker.py  # 多轮意图识别
-│       ├── recommendation_engine.py # 个性化推荐
-│       ├── chroma_memory.py   # ChromaDB 记忆管理
-│       ├── memory_config.py   # 记忆配置加载
-│       └── config.yaml        # Agent 配置文件
-│
-├── scripts/                   # 工具脚本
-│   ├── run_server.sh          # 启动 MCP 服务器
-│   ├── run_agent.sh           # 启动 Gradio UI
-│   ├── init_database.py       # 初始化数据库表结构
-│   ├── seed_data.py           # 填充测试数据
-│   ├── add_bulk_products.py   # 生成并注入 1000 款商品
-│   ├── add_bulk_users.py      # 生成并注入 200 名用户
-│   ├── update_demo_user_names.py # 随机刷新示例用户(1-5)姓名
-│   └── generate_dialogue_corpus.py # 生成 ≥200 条 RL 语料
-│
-├── docs/                      # 文档
+├── docs/                     # 项目文档与指南
 │   ├── PHASE3_COMPLETION_REPORT.md
 │   ├── PHASE4_COMPLETION_REPORT.md
 │   ├── MEMORY_CONFIG_GUIDE.md
-│   └── EXECUTION_LOG_GUIDE.md
+│   ├── MEMORY_GUIDE.md
+│   ├── EXECUTION_LOG_GUIDE.md
+│   └── GRADIO_UI_GUIDE.md
 │
-├── tests/                     # 测试
-├── pyproject.toml            # 项目配置
-├── train_rl_agent.py         # PPO 训练入口（0→1 训练流程）
-├── test_rl_modules.py        # RL 模块快速自检
-└── README.md
+├── src/
+│   ├── ontology_mcp_server/  # MCP Server (FastAPI)
+│   │   ├── server.py         # 主服务 (端口 8000)
+│   │   ├── config.py         # 配置管理
+│   │   ├── capabilities.py   # 工具能力注册
+│   │   ├── tools.py          # 工具调度逻辑
+│   │   ├── ontology_service.py# 本体推理服务
+│   │   ├── shacl_service.py  # SHACL 校验服务
+│   │   ├── commerce_service.py# 电商业务服务
+│   │   ├── db_service.py     # 数据库操作封装
+│   │   └── ecommerce_ontology.py # 本体推理引擎
+│   │
+│   └── agent/                # LangChain + RL Agent
+│       ├── gradio_ui.py      # Gradio 可视化界面 (端口 7860)
+│       ├── react_agent.py    # ReAct Agent 入口
+│       ├── mcp_adapter.py    # MCP 工具适配器
+│       ├── llm_deepseek.py   # DeepSeek/OpenAI LLM 集成
+│       ├── prompts.py        # 系统提示词管理
+│       ├── conversation_state.py # 8 阶段对话状态
+│       ├── quality_metrics.py# 对话质量评分
+│       ├── intent_tracker.py # 多轮意图识别
+│       ├── recommendation_engine.py # 个性化推荐
+│       ├── chroma_memory.py  # ChromaDB 记忆管理
+│       ├── memory_config.py  # 记忆配置加载
+│       ├── user_context_extractor.py # 动态用户上下文系统
+│       └── rl_agent/         # Stable Baselines3 集成
+│           ├── gym_env.py            # EcommerceGymEnv
+│           ├── state_extractor.py    # 128 维状态编码
+│           ├── reward_calculator.py  # 多目标奖励
+│           ├── ppo_trainer.py        # 训练编排
+│           └── __init__.py
+│
+├── tests/                    # Pytest 套件（核心/Agent/RL）
+│   ├── test_commerce_service.py
+│   ├── test_services.py
+│   ├── test_user_context.py
+│   └── ...
+│
+└── data/logs/, src/agent/logs/, src/ontology_mcp_server/logs/ 用于运行期日志与调试
 ```
 
 ## 🚀 快速开始
