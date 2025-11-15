@@ -1,0 +1,37 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix : <http://example.com/commerce#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:OrderShape a sh:NodeShape ;
+  sh:targetClass :Order ;
+  sh:property [
+    sh:path :totalAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minInclusive 0 ;
+    sh:message "totalAmount must be a non-negative decimal"
+  ] ;
+  sh:property [
+    sh:path :discountRate ;
+    sh:datatype xsd:decimal ;
+    sh:minInclusive 0 ;
+    sh:maxInclusive 1 ;
+    sh:message "discountRate must be within [0,1]"
+  ] ;
+  sh:property [
+    sh:path :hasCustomer ;
+    sh:minCount 1 ;
+    sh:message "Order must have a customer"
+  ] ;
+  sh:property [
+    sh:path :hasItem ;
+    sh:minCount 1 ;
+    sh:message "Order must have at least one item"
+  ] .
+
+:OrderItemShape a sh:NodeShape ;
+  sh:targetClass :OrderItem ;
+  sh:property [
+    sh:path :hasProduct ;
+    sh:minCount 1 ;
+    sh:message "OrderItem must reference a product"
+  ] .

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+src/agent/logs/
+src/ontology_mcp_server/logs/
+
+# Data
+data/ecommerce.db
+data/chroma_memory/
+*.db
+*.sqlite3
+
+# Temporary files
+*.tmp
+.gradio/
+test_analytics_output.json
+quality_report.md
+quality_report_detailed.json
+add_copyright.py
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,49 @@
+@prefix : <http://example.com/commerce#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix swrl: <http://www.w3.org/2003/11/swrl#> .
+@prefix swrlb: <http://www.w3.org/2003/11/swrlb#> .
+
+:Customer a owl:Class .
+:VIPCustomer a owl:Class ;
+  rdfs:subClassOf :Customer .
+
+:Product a owl:Class .
+:Order a owl:Class .
+:OrderItem a owl:Class .
+
+:hasItem a owl:ObjectProperty ;
+  rdfs:domain :Order ;
+  rdfs:range :OrderItem .
+
+:hasProduct a owl:ObjectProperty ;
+  rdfs:domain :OrderItem ;
+  rdfs:range :Product .
+
+:hasCustomer a owl:ObjectProperty ;
+  rdfs:domain :Order ;
+  rdfs:range :Customer .
+
+:totalAmount a owl:DatatypeProperty ;
+  rdfs:domain :Order ;
+  rdfs:range xsd:decimal .
+
+:discountRate a owl:DatatypeProperty ;
+  rdfs:domain :Order ;
+  rdfs:range xsd:decimal .
+
+# SWRL-like rule (annotation for demo):
+# if (?c rdf:type VIPCustomer) and (?o hasCustomer ?c) and (?o totalAmount ?amt) and swrlb:greaterThan(?amt, 1000)
+# then (?o discountRate 0.1)
+[] a swrl:Imp ;
+   rdfs:label "VIP discount rule" ;
+   swrl:body (
+     [ a swrl:ClassAtom ; swrl:classPredicate :VIPCustomer ; swrl:argument1 ?c ]
+     [ a swrl:IndividualPropertyAtom ; swrl:propertyPredicate :hasCustomer ; swrl:argument1 ?o ; swrl:argument2 ?c ]
+     [ a swrl:DatavaluedPropertyAtom ; swrl:propertyPredicate :totalAmount ; swrl:argument1 ?o ; swrl:argument2 ?amt ]
+     [ a swrl:BuiltinAtom ; swrl:builtin swrlb:greaterThan ; swrl:arguments ( ?amt 1000 ) ]
+   ) ;
+   swrl:head (
+     [ a swrl:DatavaluedPropertyAtom ; swrl:propertyPredicate :discountRate ; swrl:argument1 ?o ; swrl:argument2 0.1 ]
+   ) .

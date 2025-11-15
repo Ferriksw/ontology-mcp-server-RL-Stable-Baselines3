@@ -1,0 +1,465 @@
+@prefix : <http://example.org/ecommerce#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 电商本体 - 苹果手机在线商城
+# ============================================
+
+# 本体声明
+: rdf:type owl:Ontology ;
+    rdfs:label "E-Commerce Ontology"@en ;
+    rdfs:label "电商本体"@zh ;
+    rdfs:comment "苹果手机在线商城的本体定义，包括用户、商品、订单、物流等核心概念"@zh .
+
+# ============================================
+# 类定义 (Classes)
+# ============================================
+
+# ---------- 用户相关类 ----------
+
+:User rdf:type owl:Class ;
+    rdfs:label "User"@en ;
+    rdfs:label "用户"@zh ;
+    rdfs:comment "商城用户，可以浏览商品、下单购买"@zh .
+
+:RegularUser rdf:type owl:Class ;
+    rdfs:subClassOf :User ;
+    rdfs:label "Regular User"@en ;
+    rdfs:label "普通用户"@zh ;
+    rdfs:comment "普通注册用户，无特殊折扣"@zh .
+
+:VIPUser rdf:type owl:Class ;
+    rdfs:subClassOf :User ;
+    rdfs:label "VIP User"@en ;
+    rdfs:label "VIP用户"@zh ;
+    rdfs:comment "VIP会员，享受95折优惠，累计消费>=5000元"@zh .
+
+:SVIPUser rdf:type owl:Class ;
+    rdfs:subClassOf :VIPUser ;
+    rdfs:label "SVIP User"@en ;
+    rdfs:label "SVIP用户"@zh ;
+    rdfs:comment "超级VIP会员，享受9折优惠，累计消费>=10000元"@zh .
+
+# ---------- 商品相关类 ----------
+
+:Product rdf:type owl:Class ;
+    rdfs:label "Product"@en ;
+    rdfs:label "商品"@zh ;
+    rdfs:comment "商城中可售卖的商品"@zh .
+
+:ElectronicProduct rdf:type owl:Class ;
+    rdfs:subClassOf :Product ;
+    rdfs:label "Electronic Product"@en ;
+    rdfs:label "电子产品"@zh ;
+    rdfs:comment "电子类商品"@zh .
+
+:Smartphone rdf:type owl:Class ;
+    rdfs:subClassOf :ElectronicProduct ;
+    rdfs:label "Smartphone"@en ;
+    rdfs:label "智能手机"@zh ;
+    rdfs:comment "智能手机类商品，如iPhone系列"@zh .
+
+:Accessory rdf:type owl:Class ;
+    rdfs:subClassOf :Product ;
+    rdfs:label "Accessory"@en ;
+    rdfs:label "配件"@zh ;
+    rdfs:comment "手机配件，如耳机、充电器、保护壳等"@zh .
+
+:Service rdf:type owl:Class ;
+    rdfs:subClassOf :Product ;
+    rdfs:label "Service"@en ;
+    rdfs:label "服务"@zh ;
+    rdfs:comment "售后服务，如AppleCare+等"@zh .
+
+# ---------- 订单相关类 ----------
+
+:Order rdf:type owl:Class ;
+    rdfs:label "Order"@en ;
+    rdfs:label "订单"@zh ;
+    rdfs:comment "用户下的购买订单"@zh .
+
+:PendingOrder rdf:type owl:Class ;
+    rdfs:subClassOf :Order ;
+    rdfs:label "Pending Order"@en ;
+    rdfs:label "待支付订单"@zh ;
+    rdfs:comment "已创建但未支付的订单"@zh .
+
+:PaidOrder rdf:type owl:Class ;
+    rdfs:subClassOf :Order ;
+    rdfs:label "Paid Order"@en ;
+    rdfs:label "已支付订单"@zh ;
+    rdfs:comment "已完成支付的订单"@zh .
+
+:ShippedOrder rdf:type owl:Class ;
+    rdfs:subClassOf :PaidOrder ;
+    rdfs:label "Shipped Order"@en ;
+    rdfs:label "已发货订单"@zh ;
+    rdfs:comment "已发货但未签收的订单"@zh .
+
+:CompletedOrder rdf:type owl:Class ;
+    rdfs:subClassOf :ShippedOrder ;
+    rdfs:label "Completed Order"@en ;
+    rdfs:label "已完成订单"@zh ;
+    rdfs:comment "已签收完成的订单"@zh .
+
+:CancelledOrder rdf:type owl:Class ;
+    rdfs:subClassOf :Order ;
+    rdfs:label "Cancelled Order"@en ;
+    rdfs:label "已取消订单"@zh ;
+    rdfs:comment "用户或系统取消的订单"@zh .
+
+# ---------- 支付相关类 ----------
+
+:Payment rdf:type owl:Class ;
+    rdfs:label "Payment"@en ;
+    rdfs:label "支付"@zh ;
+    rdfs:comment "订单的支付记录"@zh .
+
+:AlipayPayment rdf:type owl:Class ;
+    rdfs:subClassOf :Payment ;
+    rdfs:label "Alipay Payment"@en ;
+    rdfs:label "支付宝支付"@zh .
+
+:WeChatPayment rdf:type owl:Class ;
+    rdfs:subClassOf :Payment ;
+    rdfs:label "WeChat Payment"@en ;
+    rdfs:label "微信支付"@zh .
+
+:CreditCardPayment rdf:type owl:Class ;
+    rdfs:subClassOf :Payment ;
+    rdfs:label "Credit Card Payment"@en ;
+    rdfs:label "信用卡支付"@zh .
+
+:ApplePayPayment rdf:type owl:Class ;
+    rdfs:subClassOf :Payment ;
+    rdfs:label "Apple Pay Payment"@en ;
+    rdfs:label "Apple Pay支付"@zh .
+
+# ---------- 物流相关类 ----------
+
+:Shipment rdf:type owl:Class ;
+    rdfs:label "Shipment"@en ;
+    rdfs:label "物流"@zh ;
+    rdfs:comment "订单的物流配送信息"@zh .
+
+:ExpressShipment rdf:type owl:Class ;
+    rdfs:subClassOf :Shipment ;
+    rdfs:label "Express Shipment"@en ;
+    rdfs:label "快递配送"@zh ;
+    rdfs:comment "标准快递配送"@zh .
+
+:NextDayDelivery rdf:type owl:Class ;
+    rdfs:subClassOf :ExpressShipment ;
+    rdfs:label "Next Day Delivery"@en ;
+    rdfs:label "次日达"@zh ;
+    rdfs:comment "SVIP专享，次日送达"@zh .
+
+# ---------- 折扣相关类 ----------
+
+:Discount rdf:type owl:Class ;
+    rdfs:label "Discount"@en ;
+    rdfs:label "折扣"@zh ;
+    rdfs:comment "订单可享受的折扣"@zh .
+
+:UserLevelDiscount rdf:type owl:Class ;
+    rdfs:subClassOf :Discount ;
+    rdfs:label "User Level Discount"@en ;
+    rdfs:label "会员等级折扣"@zh ;
+    rdfs:comment "基于用户会员等级的折扣"@zh .
+
+:VolumeDiscount rdf:type owl:Class ;
+    rdfs:subClassOf :Discount ;
+    rdfs:label "Volume Discount"@en ;
+    rdfs:label "批量折扣"@zh ;
+    rdfs:comment "基于订单金额的批量折扣"@zh .
+
+:PromotionDiscount rdf:type owl:Class ;
+    rdfs:subClassOf :Discount ;
+    rdfs:label "Promotion Discount"@en ;
+    rdfs:label "促销折扣"@zh ;
+    rdfs:comment "限时促销活动折扣"@zh .
+
+# ---------- 客服相关类 ----------
+
+:SupportTicket rdf:type owl:Class ;
+    rdfs:label "Support Ticket"@en ;
+    rdfs:label "客服工单"@zh ;
+    rdfs:comment "用户提交的客服请求"@zh .
+
+:PreSalesTicket rdf:type owl:Class ;
+    rdfs:subClassOf :SupportTicket ;
+    rdfs:label "Pre-sales Ticket"@en ;
+    rdfs:label "售前咨询"@zh .
+
+:AfterSalesTicket rdf:type owl:Class ;
+    rdfs:subClassOf :SupportTicket ;
+    rdfs:label "After-sales Ticket"@en ;
+    rdfs:label "售后服务"@zh .
+
+:ReturnRequest rdf:type owl:Class ;
+    rdfs:subClassOf :AfterSalesTicket ;
+    rdfs:label "Return Request"@en ;
+    rdfs:label "退货申请"@zh .
+
+:ExchangeRequest rdf:type owl:Class ;
+    rdfs:subClassOf :AfterSalesTicket ;
+    rdfs:label "Exchange Request"@en ;
+    rdfs:label "换货申请"@zh .
+
+# ============================================
+# 对象属性 (Object Properties)
+# ============================================
+
+:hasOrder rdf:type owl:ObjectProperty ;
+    rdfs:domain :User ;
+    rdfs:range :Order ;
+    rdfs:label "has order"@en ;
+    rdfs:label "拥有订单"@zh ;
+    rdfs:comment "用户拥有的订单"@zh .
+
+:containsProduct rdf:type owl:ObjectProperty ;
+    rdfs:domain :Order ;
+    rdfs:range :Product ;
+    rdfs:label "contains product"@en ;
+    rdfs:label "包含商品"@zh ;
+    rdfs:comment "订单中包含的商品"@zh .
+
+:hasPayment rdf:type owl:ObjectProperty ;
+    rdfs:domain :Order ;
+    rdfs:range :Payment ;
+    rdfs:label "has payment"@en ;
+    rdfs:label "关联支付"@zh ;
+    rdfs:comment "订单关联的支付记录"@zh .
+
+:hasShipment rdf:type owl:ObjectProperty ;
+    rdfs:domain :Order ;
+    rdfs:range :Shipment ;
+    rdfs:label "has shipment"@en ;
+    rdfs:label "关联物流"@zh ;
+    rdfs:comment "订单关联的物流信息"@zh .
+
+:appliesDiscount rdf:type owl:ObjectProperty ;
+    rdfs:domain :Order ;
+    rdfs:range :Discount ;
+    rdfs:label "applies discount"@en ;
+    rdfs:label "应用折扣"@zh ;
+    rdfs:comment "订单应用的折扣"@zh .
+
+:belongsToCategory rdf:type owl:ObjectProperty ;
+    rdfs:domain :Product ;
+    rdfs:range owl:Thing ;
+    rdfs:label "belongs to category"@en ;
+    rdfs:label "属于分类"@zh ;
+    rdfs:comment "商品所属的分类"@zh .
+
+:hasSupportTicket rdf:type owl:ObjectProperty ;
+    rdfs:domain :User ;
+    rdfs:range :SupportTicket ;
+    rdfs:label "has support ticket"@en ;
+    rdfs:label "提交工单"@zh ;
+    rdfs:comment "用户提交的客服工单"@zh .
+
+# ============================================
+# 数据属性 (Data Properties)
+# ============================================
+
+# ---------- 用户属性 ----------
+
+:userId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :User ;
+    rdfs:range xsd:integer ;
+    rdfs:label "user ID"@en ;
+    rdfs:label "用户ID"@zh .
+
+:username rdf:type owl:DatatypeProperty ;
+    rdfs:domain :User ;
+    rdfs:range xsd:string ;
+    rdfs:label "username"@en ;
+    rdfs:label "用户名"@zh .
+
+:userLevel rdf:type owl:DatatypeProperty ;
+    rdfs:domain :User ;
+    rdfs:range xsd:string ;
+    rdfs:label "user level"@en ;
+    rdfs:label "会员等级"@zh ;
+    rdfs:comment "用户的会员等级: Regular/VIP/SVIP"@zh .
+
+:totalSpent rdf:type owl:DatatypeProperty ;
+    rdfs:domain :User ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "total spent"@en ;
+    rdfs:label "累计消费"@zh ;
+    rdfs:comment "用户累计消费金额"@zh .
+
+:creditScore rdf:type owl:DatatypeProperty ;
+    rdfs:domain :User ;
+    rdfs:range xsd:integer ;
+    rdfs:label "credit score"@en ;
+    rdfs:label "信用分"@zh ;
+    rdfs:comment "用户信用评分"@zh .
+
+# ---------- 商品属性 ----------
+
+:productId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:integer ;
+    rdfs:label "product ID"@en ;
+    rdfs:label "商品ID"@zh .
+
+:productName rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:string ;
+    rdfs:label "product name"@en ;
+    rdfs:label "商品名称"@zh .
+
+:price rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "price"@en ;
+    rdfs:label "价格"@zh ;
+    rdfs:comment "商品价格(元)"@zh .
+
+:stockQuantity rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:integer ;
+    rdfs:label "stock quantity"@en ;
+    rdfs:label "库存数量"@zh .
+
+:brand rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:string ;
+    rdfs:label "brand"@en ;
+    rdfs:label "品牌"@zh .
+
+:model rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Product ;
+    rdfs:range xsd:string ;
+    rdfs:label "model"@en ;
+    rdfs:label "型号"@zh .
+
+# ---------- 订单属性 ----------
+
+:orderId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:integer ;
+    rdfs:label "order ID"@en ;
+    rdfs:label "订单ID"@zh .
+
+:orderNo rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:string ;
+    rdfs:label "order number"@en ;
+    rdfs:label "订单号"@zh .
+
+:orderAmount rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "order amount"@en ;
+    rdfs:label "订单金额"@zh ;
+    rdfs:comment "订单总金额"@zh .
+
+:discountAmount rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "discount amount"@en ;
+    rdfs:label "折扣金额"@zh ;
+    rdfs:comment "订单折扣金额"@zh .
+
+:finalAmount rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "final amount"@en ;
+    rdfs:label "最终金额"@zh ;
+    rdfs:comment "折后实付金额"@zh .
+
+:orderStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:string ;
+    rdfs:label "order status"@en ;
+    rdfs:label "订单状态"@zh ;
+    rdfs:comment "订单状态: pending/paid/shipped/delivered/cancelled"@zh .
+
+:shippingAddress rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Order ;
+    rdfs:range xsd:string ;
+    rdfs:label "shipping address"@en ;
+    rdfs:label "收货地址"@zh .
+
+# ---------- 折扣属性 ----------
+
+:discountRate rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Discount ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "discount rate"@en ;
+    rdfs:label "折扣率"@zh ;
+    rdfs:comment "折扣率，如0.95表示95折"@zh .
+
+:discountType rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Discount ;
+    rdfs:range xsd:string ;
+    rdfs:label "discount type"@en ;
+    rdfs:label "折扣类型"@zh .
+
+# ---------- 物流属性 ----------
+
+:trackingNo rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Shipment ;
+    rdfs:range xsd:string ;
+    rdfs:label "tracking number"@en ;
+    rdfs:label "运单号"@zh .
+
+:carrier rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Shipment ;
+    rdfs:range xsd:string ;
+    rdfs:label "carrier"@en ;
+    rdfs:label "承运商"@zh ;
+    rdfs:comment "物流公司: 顺丰/京东/圆通等"@zh .
+
+:shipmentStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Shipment ;
+    rdfs:range xsd:string ;
+    rdfs:label "shipment status"@en ;
+    rdfs:label "物流状态"@zh .
+
+:currentLocation rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Shipment ;
+    rdfs:range xsd:string ;
+    rdfs:label "current location"@en ;
+    rdfs:label "当前位置"@zh .
+
+# ============================================
+# 业务规则约束 (使用 SWRL 风格注释)
+# ============================================
+
+# 规则1: VIP用户判定
+# Rule: User(?u) ^ totalSpent(?u, ?s) ^ greaterThanOrEqual(?s, 5000) ^ lessThan(?s, 10000) -> VIPUser(?u)
+
+# 规则2: SVIP用户判定  
+# Rule: User(?u) ^ totalSpent(?u, ?s) ^ greaterThanOrEqual(?s, 10000) -> SVIPUser(?u)
+
+# 规则3: VIP折扣
+# Rule: Order(?o) ^ hasOrder(?u, ?o) ^ VIPUser(?u) -> appliesDiscount(?o, VIPDiscount) ^ discountRate(VIPDiscount, 0.95)
+
+# 规则4: SVIP折扣
+# Rule: Order(?o) ^ hasOrder(?u, ?o) ^ SVIPUser(?u) -> appliesDiscount(?o, SVIPDiscount) ^ discountRate(SVIPDiscount, 0.90)
+
+# 规则5: 批量折扣 (订单金额>=5000)
+# Rule: Order(?o) ^ orderAmount(?o, ?a) ^ greaterThanOrEqual(?a, 5000) -> appliesDiscount(?o, VolumeDiscount5k) ^ discountRate(VolumeDiscount5k, 0.95)
+
+# 规则6: 大额批量折扣 (订单金额>=10000)
+# Rule: Order(?o) ^ orderAmount(?o, ?a) ^ greaterThanOrEqual(?a, 10000) -> appliesDiscount(?o, VolumeDiscount10k) ^ discountRate(VolumeDiscount10k, 0.90)
+
+# 规则7: 包邮条件
+# Rule: Order(?o) ^ (orderAmount(?o, ?a) ^ greaterThanOrEqual(?a, 500)) OR (hasOrder(?u, ?o) ^ VIPUser(?u)) -> freeShipping(?o, true)
+
+# 规则8: SVIP次日达
+# Rule: Order(?o) ^ hasOrder(?u, ?o) ^ SVIPUser(?u) -> hasShipment(?o, ?s) ^ NextDayDelivery(?s)
+
+# 规则9: 退货期限 - 普通用户7天
+# Rule: User(?u) ^ RegularUser(?u) -> returnPeriod(?u, 7)
+
+# 规则10: 退货期限 - VIP用户15天
+# Rule: User(?u) ^ VIPUser(?u) -> returnPeriod(?u, 15)

@@ -1,0 +1,14 @@
+{
+  "Smartphone": {
+    "uri": "http://example.com/commerce#Smartphone",
+    "synonyms": ["smartphone", "phone", "mobile phone", "cellphone", "智能手机", "手机"]
+  },
+  "Laptop": {
+    "uri": "http://example.com/commerce#Laptop",
+    "synonyms": ["laptop", "notebook", "ultrabook", "笔记本"]
+  },
+  "Headphones": {
+    "uri": "http://example.com/commerce#Headphones",
+    "synonyms": ["headphones", "earphones", "earbuds", "耳机"]
+  }
+}

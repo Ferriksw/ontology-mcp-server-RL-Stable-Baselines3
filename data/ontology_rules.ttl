@@ -1,0 +1,355 @@
+@prefix : <http://example.org/ecommerce#> .
+@prefix rule: <http://example.org/rules#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# 电商业务规则本体
+# ============================================
+
+rule: rdf:type owl:Ontology ;
+    rdfs:label "E-Commerce Business Rules"@en ;
+    rdfs:label "电商业务规则"@zh ;
+    rdfs:comment "定义电商系统的业务规则，包括会员升级、折扣计算、物流策略等"@zh ;
+    owl:imports <http://example.org/ecommerce#> .
+
+# ============================================
+# 规则类定义
+# ============================================
+
+rule:BusinessRule rdf:type owl:Class ;
+    rdfs:label "Business Rule"@en ;
+    rdfs:label "业务规则"@zh ;
+    rdfs:comment "通用业务规则基类"@zh .
+
+rule:UserLevelRule rdf:type owl:Class ;
+    rdfs:subClassOf rule:BusinessRule ;
+    rdfs:label "User Level Rule"@en ;
+    rdfs:label "用户等级规则"@zh ;
+    rdfs:comment "用户会员等级判定规则"@zh .
+
+rule:DiscountRule rdf:type owl:Class ;
+    rdfs:subClassOf rule:BusinessRule ;
+    rdfs:label "Discount Rule"@en ;
+    rdfs:label "折扣规则"@zh ;
+    rdfs:comment "订单折扣计算规则"@zh .
+
+rule:ShippingRule rdf:type owl:Class ;
+    rdfs:subClassOf rule:BusinessRule ;
+    rdfs:label "Shipping Rule"@en ;
+    rdfs:label "物流规则"@zh ;
+    rdfs:comment "物流策略规则"@zh .
+
+rule:ReturnRule rdf:type owl:Class ;
+    rdfs:subClassOf rule:BusinessRule ;
+    rdfs:label "Return Rule"@en ;
+    rdfs:label "退换货规则"@zh ;
+    rdfs:comment "退换货政策规则"@zh .
+
+# ============================================
+# 规则属性
+# ============================================
+
+rule:condition rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "condition"@en ;
+    rdfs:label "触发条件"@zh ;
+    rdfs:comment "规则触发的条件表达式"@zh .
+
+rule:action rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "action"@en ;
+    rdfs:label "执行动作"@zh ;
+    rdfs:comment "规则执行的动作"@zh .
+
+rule:priority rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:integer ;
+    rdfs:label "priority"@en ;
+    rdfs:label "优先级"@zh ;
+    rdfs:comment "规则优先级，数字越大优先级越高"@zh .
+
+rule:discountRate rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:DiscountRule ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "discount rate"@en ;
+    rdfs:label "折扣率"@zh .
+
+rule:minAmount rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:DiscountRule ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "minimum amount"@en ;
+    rdfs:label "最低金额"@zh .
+
+rule:shippingCost rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:ShippingRule ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "shipping cost"@en ;
+    rdfs:label "运费"@zh .
+
+rule:shippingType rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:ShippingRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "shipping type"@en ;
+    rdfs:label "配送类型"@zh .
+
+rule:returnPeriodDays rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:ReturnRule ;
+    rdfs:range xsd:integer ;
+    rdfs:label "return period days"@en ;
+    rdfs:label "退货期限(天)"@zh .
+
+rule:applicableTo rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:ReturnRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "applicable to"@en ;
+    rdfs:label "适用范围"@zh .
+
+# ============================================
+# 具体业务规则实例
+# ============================================
+
+# ---------- 用户等级规则 ----------
+
+rule:VIPUpgradeRule rdf:type rule:UserLevelRule ;
+    rdfs:label "VIP Upgrade Rule"@en ;
+    rdfs:label "VIP升级规则"@zh ;
+    rule:condition "totalSpent >= 5000 AND totalSpent < 10000" ;
+    rule:action "升级用户等级为VIP" ;
+    rule:priority 10 ;
+    rdfs:comment "累计消费满5000元升级为VIP会员"@zh .
+
+rule:SVIPUpgradeRule rdf:type rule:UserLevelRule ;
+    rdfs:label "SVIP Upgrade Rule"@en ;
+    rdfs:label "SVIP升级规则"@zh ;
+    rule:condition "totalSpent >= 10000" ;
+    rule:action "升级用户等级为SVIP" ;
+    rule:priority 20 ;
+    rdfs:comment "累计消费满10000元升级为SVIP会员"@zh .
+
+# ---------- 折扣规则 ----------
+
+# VIP会员折扣
+rule:VIPDiscountRule rdf:type rule:DiscountRule ;
+    rdfs:label "VIP Discount Rule"@en ;
+    rdfs:label "VIP折扣规则"@zh ;
+    rule:condition "userLevel = 'VIP'" ;
+    rule:action "应用VIP折扣" ;
+    rule:discountRate "0.95"^^xsd:decimal ;
+    rule:priority 30 ;
+    rdfs:comment "VIP用户享受95折优惠"@zh .
+
+# SVIP会员折扣
+rule:SVIPDiscountRule rdf:type rule:DiscountRule ;
+    rdfs:label "SVIP Discount Rule"@en ;
+    rdfs:label "SVIP折扣规则"@zh ;
+    rule:condition "userLevel = 'SVIP'" ;
+    rule:action "应用SVIP折扣" ;
+    rule:discountRate "0.90"^^xsd:decimal ;
+    rule:priority 40 ;
+    rdfs:comment "SVIP用户享受9折优惠"@zh .
+
+# 批量折扣 - 5000元档
+rule:VolumeDiscount5kRule rdf:type rule:DiscountRule ;
+    rdfs:label "Volume Discount 5k Rule"@en ;
+    rdfs:label "批量折扣5000规则"@zh ;
+    rule:condition "orderAmount >= 5000 AND orderAmount < 10000" ;
+    rule:action "应用批量折扣95折" ;
+    rule:discountRate "0.95"^^xsd:decimal ;
+    rule:minAmount "5000"^^xsd:decimal ;
+    rule:priority 15 ;
+    rdfs:comment "订单金额满5000元享95折"@zh .
+
+# 批量折扣 - 10000元档
+rule:VolumeDiscount10kRule rdf:type rule:DiscountRule ;
+    rdfs:label "Volume Discount 10k Rule"@en ;
+    rdfs:label "批量折扣10000规则"@zh ;
+    rule:condition "orderAmount >= 10000" ;
+    rule:action "应用批量折扣9折" ;
+    rule:discountRate "0.90"^^xsd:decimal ;
+    rule:minAmount "10000"^^xsd:decimal ;
+    rule:priority 25 ;
+    rdfs:comment "订单金额满10000元享9折"@zh .
+
+# 新用户首单折扣
+rule:FirstOrderDiscountRule rdf:type rule:DiscountRule ;
+    rdfs:label "First Order Discount Rule"@en ;
+    rdfs:label "首单折扣规则"@zh ;
+    rule:condition "orderCount = 1" ;
+    rule:action "应用首单折扣" ;
+    rule:discountRate "0.98"^^xsd:decimal ;
+    rule:priority 5 ;
+    rdfs:comment "新用户首单享98折优惠"@zh .
+
+# ---------- 物流规则 ----------
+
+# 包邮规则 - 金额满500
+rule:FreeShipping500Rule rdf:type rule:ShippingRule ;
+    rdfs:label "Free Shipping 500 Rule"@en ;
+    rdfs:label "满500包邮规则"@zh ;
+    rule:condition "orderAmount >= 500" ;
+    rule:action "免运费" ;
+    rule:shippingCost "0"^^xsd:decimal ;
+    rule:priority 10 ;
+    rdfs:comment "订单金额满500元包邮"@zh .
+
+# VIP包邮规则
+rule:VIPFreeShippingRule rdf:type rule:ShippingRule ;
+    rdfs:label "VIP Free Shipping Rule"@en ;
+    rdfs:label "VIP包邮规则"@zh ;
+    rule:condition "userLevel = 'VIP' OR userLevel = 'SVIP'" ;
+    rule:action "VIP免运费" ;
+    rule:shippingCost "0"^^xsd:decimal ;
+    rule:priority 20 ;
+    rdfs:comment "VIP及以上会员订单包邮"@zh .
+
+# SVIP次日达规则
+rule:SVIPNextDayDeliveryRule rdf:type rule:ShippingRule ;
+    rdfs:label "SVIP Next Day Delivery Rule"@en ;
+    rdfs:label "SVIP次日达规则"@zh ;
+    rule:condition "userLevel = 'SVIP'" ;
+    rule:action "提供次日达服务" ;
+    rule:shippingType "NextDayDelivery" ;
+    rule:shippingCost "0"^^xsd:decimal ;
+    rule:priority 30 ;
+    rdfs:comment "SVIP用户享受免费次日达服务"@zh .
+
+# 标准运费规则
+rule:StandardShippingRule rdf:type rule:ShippingRule ;
+    rdfs:label "Standard Shipping Rule"@en ;
+    rdfs:label "标准运费规则"@zh ;
+    rule:condition "orderAmount < 500 AND userLevel = 'Regular'" ;
+    rule:action "收取标准运费" ;
+    rule:shippingCost "15"^^xsd:decimal ;
+    rule:shippingType "Standard" ;
+    rule:priority 5 ;
+    rdfs:comment "普通用户订单不满500元收取15元运费"@zh .
+
+# 偏远地区加收运费
+rule:RemoteAreaShippingRule rdf:type rule:ShippingRule ;
+    rdfs:label "Remote Area Shipping Rule"@en ;
+    rdfs:label "偏远地区运费规则"@zh ;
+    rule:condition "isRemoteArea = true" ;
+    rule:action "偏远地区加收运费" ;
+    rule:shippingCost "30"^^xsd:decimal ;
+    rule:priority 35 ;
+    rdfs:comment "偏远地区加收30元运费"@zh .
+
+# ---------- 退换货规则 ----------
+
+# 普通用户7天无理由退货
+rule:Standard7DayReturnRule rdf:type rule:ReturnRule ;
+    rdfs:label "Standard 7-Day Return Rule"@en ;
+    rdfs:label "标准7天退货规则"@zh ;
+    rule:condition "userLevel = 'Regular' AND withinDays <= 7" ;
+    rule:action "允许7天无理由退货" ;
+    rule:returnPeriodDays 7 ;
+    rule:applicableTo "所有商品" ;
+    rule:priority 10 ;
+    rdfs:comment "普通用户享受7天无理由退货"@zh .
+
+# VIP用户15天退货
+rule:VIP15DayReturnRule rdf:type rule:ReturnRule ;
+    rdfs:label "VIP 15-Day Return Rule"@en ;
+    rdfs:label "VIP 15天退货规则"@zh ;
+    rule:condition "userLevel IN ('VIP', 'SVIP') AND withinDays <= 15" ;
+    rule:action "允许15天无理由退货" ;
+    rule:returnPeriodDays 15 ;
+    rule:applicableTo "所有商品" ;
+    rule:priority 20 ;
+    rdfs:comment "VIP及SVIP用户享受15天无理由退货"@zh .
+
+# 电子产品特殊退货规则
+rule:ElectronicReturnRule rdf:type rule:ReturnRule ;
+    rdfs:label "Electronic Return Rule"@en ;
+    rdfs:label "电子产品退货规则"@zh ;
+    rule:condition "category = 'ElectronicProduct' AND isActivated = false" ;
+    rule:action "未激活可退货" ;
+    rule:applicableTo "电子产品" ;
+    rule:priority 25 ;
+    rdfs:comment "电子产品未激活状态可退货"@zh .
+
+# 配件类商品退货
+rule:AccessoryReturnRule rdf:type rule:ReturnRule ;
+    rdfs:label "Accessory Return Rule"@en ;
+    rdfs:label "配件退货规则"@zh ;
+    rule:condition "category = 'Accessory' AND packaging = 'intact'" ;
+    rule:action "包装完好可退货" ;
+    rule:applicableTo "配件类商品" ;
+    rule:priority 15 ;
+    rdfs:comment "配件类商品包装完好可退货"@zh .
+
+# 服务类商品不可退
+rule:ServiceNoReturnRule rdf:type rule:ReturnRule ;
+    rdfs:label "Service No Return Rule"@en ;
+    rdfs:label "服务不可退规则"@zh ;
+    rule:condition "category = 'Service'" ;
+    rule:action "服务类商品不可退" ;
+    rule:returnPeriodDays 0 ;
+    rule:applicableTo "服务类商品" ;
+    rule:priority 30 ;
+    rdfs:comment "AppleCare+等服务类商品不可退货"@zh .
+
+# ============================================
+# 规则组合策略
+# ============================================
+
+# 折扣叠加策略: 会员折扣与批量折扣不可叠加，取优惠力度大的
+rule:DiscountStackingStrategy rdf:type rule:BusinessRule ;
+    rdfs:label "Discount Stacking Strategy"@en ;
+    rdfs:label "折扣叠加策略"@zh ;
+    rule:condition "hasMultipleDiscounts = true" ;
+    rule:action "选择折扣力度最大的单一折扣应用" ;
+    rule:priority 100 ;
+    rdfs:comment "会员折扣与批量折扣不叠加，系统自动选择优惠最大的"@zh .
+
+# 物流优先级策略
+rule:ShippingPriorityStrategy rdf:type rule:BusinessRule ;
+    rdfs:label "Shipping Priority Strategy"@en ;
+    rdfs:label "物流优先级策略"@zh ;
+    rule:condition "hasMultipleShippingOptions = true" ;
+    rule:action "按优先级选择物流方案" ;
+    rule:priority 90 ;
+    rdfs:comment "多个物流规则同时满足时，选择优先级最高的"@zh .
+
+# ============================================
+# 规则元数据
+# ============================================
+
+rule:RuleMetadata rdf:type owl:Class ;
+    rdfs:label "Rule Metadata"@en ;
+    rdfs:label "规则元数据"@zh .
+
+rule:effectiveDate rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "effective date"@en ;
+    rdfs:label "生效日期"@zh .
+
+rule:expiryDate rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "expiry date"@en ;
+    rdfs:label "失效日期"@zh .
+
+rule:isActive rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "is active"@en ;
+    rdfs:label "是否激活"@zh .
+
+rule:createdBy rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "created by"@en ;
+    rdfs:label "创建者"@zh .
+
+rule:lastModified rdf:type owl:DatatypeProperty ;
+    rdfs:domain rule:BusinessRule ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "last modified"@en ;
+    rdfs:label "最后修改时间"@zh .

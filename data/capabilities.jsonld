@@ -1,0 +1,436 @@
+{
+  "version": "1.0",
+  "capabilities": [
+    {
+      "name": "ontology.explain_discount",
+      "title": "折扣解释",
+      "description": "根据本体规则解释 VIP 折扣，可选启用 Owlready2 推理",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "is_vip": {"type": "boolean"},
+          "amount": {"type": "number"}
+        },
+        "required": ["is_vip", "amount"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "discount_applied": {"type": "boolean"},
+          "discount_rate": {"type": "number"},
+          "rule_source": {"type": "string"}
+        },
+        "required": ["discount_applied", "discount_rate", "rule_source"]
+      }
+    },
+    {
+      "name": "ontology.normalize_product",
+      "title": "商品同义词归一",
+      "description": "将自由文本映射为规范化商品名称与 URI",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string"}
+        },
+        "required": ["text"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "canonical_name": {"type": "string"},
+          "uri": {"type": ["string", "null"]},
+          "matched_synonym": {"type": ["string", "null"]}
+        },
+        "required": ["canonical_name", "uri"]
+      }
+    },
+    {
+      "name": "ontology.validate_order",
+      "title": "订单 SHACL 校验",
+      "description": "对订单 RDF 图执行 SHACL 规则，验证折扣与总额一致性",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "data": {"type": "string", "description": "Turtle 或 JSON-LD 文本"},
+          "format": {"type": "string", "enum": ["turtle", "json-ld"], "default": "turtle"}
+        },
+        "required": ["data"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "conforms": {"type": "boolean"},
+          "report": {"type": "string"}
+        },
+        "required": ["conforms", "report"]
+      }
+    },
+    {
+      "name": "commerce.search_products",
+      "title": "搜索商品",
+      "description": "按关键字、分类、品牌等条件搜索商品列表。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "keyword": {"type": ["string", "null"], "description": "模糊搜索关键字"},
+          "category": {"type": ["string", "null"], "description": "商品分类，如 手机/配件"},
+          "brand": {"type": ["string", "null"], "description": "品牌过滤条件"},
+          "min_price": {"type": ["number", "null"], "description": "最小价格"},
+          "max_price": {"type": ["number", "null"], "description": "最大价格"},
+          "available_only": {"type": "boolean", "default": true, "description": "仅返回可售商品"},
+          "limit": {"type": "integer", "default": 20, "description": "返回数量上限"}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "total": {"type": "integer"},
+          "items": {"type": "array", "items": {"type": "object"}}
+        },
+        "required": ["total", "items"]
+      }
+    },
+    {
+      "name": "commerce.get_product_detail",
+      "title": "商品详情",
+      "description": "根据商品 ID 获取详细信息。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": "integer"}
+        },
+        "required": ["product_id"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.check_stock",
+      "title": "库存检查",
+      "description": "检查商品库存是否满足指定数量。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": "integer"},
+          "quantity": {"type": "integer"}
+        },
+        "required": ["product_id", "quantity"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": "integer"},
+          "requested_quantity": {"type": "integer"},
+          "available": {"type": "boolean"},
+          "stock_quantity": {"type": "integer"}
+        },
+        "required": ["product_id", "requested_quantity", "available", "stock_quantity"]
+      }
+    },
+    {
+      "name": "commerce.get_product_recommendations",
+      "title": "相关推荐",
+      "description": "根据同类目或指定商品生成推荐列表。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": ["integer", "null"]},
+          "category": {"type": ["string", "null"]},
+          "limit": {"type": "integer", "default": 5}
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "category": {"type": ["string", "null"]},
+          "items": {"type": "array", "items": {"type": "object"}}
+        },
+        "required": ["items"]
+      }
+    },
+    {
+      "name": "commerce.get_product_reviews",
+      "title": "商品评价列表",
+      "description": "查看指定商品的评价记录。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": "integer"},
+          "limit": {"type": "integer", "default": 10}
+        },
+        "required": ["product_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "product_id": {"type": "integer"},
+          "reviews": {"type": "array", "items": {"type": "object"}}
+        },
+        "required": ["product_id", "reviews"]
+      }
+    },
+    {
+      "name": "commerce.add_to_cart",
+      "title": "加入购物车",
+      "description": "将商品加入指定用户的购物车。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "product_id": {"type": "integer"},
+          "quantity": {"type": "integer", "default": 1}
+        },
+        "required": ["user_id", "product_id"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.view_cart",
+      "title": "查看购物车",
+      "description": "返回用户购物车中商品及数量。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"}
+        },
+        "required": ["user_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "items": {"type": "array", "items": {"type": "object"}}
+        },
+        "required": ["user_id", "items"]
+      }
+    },
+    {
+      "name": "commerce.remove_from_cart",
+      "title": "移除购物车商品",
+      "description": "从购物车移除指定商品。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "product_id": {"type": "integer"}
+        },
+        "required": ["user_id", "product_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "removed": {"type": "boolean"}
+        },
+        "required": ["removed"]
+      }
+    },
+    {
+      "name": "commerce.create_order",
+      "title": "创建订单",
+      "description": "根据购物项与地址创建订单，自动应用本体推理折扣与物流策略。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {"type": "integer"},
+                "quantity": {"type": "integer"},
+                "unit_price": {"type": ["number", "null"]}
+              },
+              "required": ["product_id", "quantity"]
+            }
+          },
+          "shipping_address": {"type": "string"},
+          "contact_phone": {"type": "string"}
+        },
+        "required": ["user_id", "items", "shipping_address", "contact_phone"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "order": {"type": "object"},
+          "inference": {"type": "object"},
+          "shipping": {"type": "object"}
+        },
+        "required": ["order", "inference", "shipping"]
+      }
+    },
+    {
+      "name": "commerce.get_order_detail",
+      "title": "订单详情",
+      "description": "返回订单基础信息、用户信息与物流状态。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"}
+        },
+        "required": ["order_id"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.cancel_order",
+      "title": "取消订单",
+      "description": "取消待支付或已支付的订单。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"}
+        },
+        "required": ["order_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "cancelled": {"type": "boolean"}
+        },
+        "required": ["cancelled"]
+      }
+    },
+    {
+      "name": "commerce.get_user_orders",
+      "title": "用户订单列表",
+      "description": "按状态筛选用户订单。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "status": {"type": ["string", "null"]}
+        },
+        "required": ["user_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "orders": {"type": "array", "items": {"type": "object"}}
+        },
+        "required": ["user_id", "orders"]
+      }
+    },
+    {
+      "name": "commerce.process_payment",
+      "title": "处理支付",
+      "description": "创建支付记录并更新订单支付状态。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"},
+          "payment_method": {"type": "string"},
+          "amount": {"type": "number"}
+        },
+        "required": ["order_id", "payment_method", "amount"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.track_shipment",
+      "title": "物流追踪",
+      "description": "根据运单号查看物流进度。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "tracking_no": {"type": "string"}
+        },
+        "required": ["tracking_no"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.get_shipment_status",
+      "title": "订单物流状态",
+      "description": "按订单 ID 查询最新物流信息。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"}
+        },
+        "required": ["order_id"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.create_support_ticket",
+      "title": "创建客服工单",
+      "description": "为用户创建售后/投诉工单，并可附初始留言。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "subject": {"type": "string"},
+          "description": {"type": "string"},
+          "order_id": {"type": ["integer", "null"]},
+          "category": {"type": "string", "default": "售后"},
+          "priority": {"type": "string", "default": "medium"},
+          "initial_message": {"type": ["string", "null"]}
+        },
+        "required": ["user_id", "subject", "description"]
+      },
+      "output_schema": {
+        "type": "object"
+      }
+    },
+    {
+      "name": "commerce.process_return",
+      "title": "申请退换货",
+      "description": "依据本体规则判断退货资格并生成退货申请。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "integer"},
+          "user_id": {"type": "integer"},
+          "return_type": {"type": "string", "default": "return"},
+          "reason": {"type": "string", "default": ""},
+          "product_category": {"type": "string", "default": "手机"},
+          "is_activated": {"type": "boolean", "default": false}
+        },
+        "required": ["order_id", "user_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "return_created": {"type": "boolean"},
+          "policy": {"type": "object"}
+        },
+        "required": ["return_created", "policy"]
+      }
+    },
+    {
+      "name": "commerce.get_user_profile",
+      "title": "用户画像",
+      "description": "获取用户基础信息、近期开单与推理等级。",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"}
+        },
+        "required": ["user_id"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "user": {"type": "object"},
+          "orders": {"type": "array", "items": {"type": "object"}},
+          "inferred_level": {"type": "string"},
+          "should_upgrade": {"type": "boolean"}
+        },
+        "required": ["user", "inferred_level", "should_upgrade"]
+      }
+    }
+  ]
+}
