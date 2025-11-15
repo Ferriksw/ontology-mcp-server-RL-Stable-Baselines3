@@ -108,8 +108,10 @@ ontology-rl-commerce-agent/
 
 **系统要求**:
 - Python 3.10+
-- 8GB+ RAM (用于本体推理和 LLM)
+- 8GB+ RAM (推理/演示足够；若执行 RL 训练建议 32GB+)
 - Linux/macOS/WSL2
+- GPU (可选)：建议使用至少 1 块 12GB 显存的 NVIDIA CUDA GPU；若无 GPU，可在 CPU 上训练但需显著更长时间
+- 磁盘：>40GB 可用空间（数据库、Chroma 向量库、RL 模型检查点）
 
 **安装依赖**:
 
@@ -402,6 +404,8 @@ curl -X POST http://localhost:8000/invoke \
 - 相关商品关联
 
 ## 🧠 强化学习自进化 (Phase 6)
+
+> **硬件建议**：PPO 训练阶段建议使用 8+ 核 CPU、32GB 以上内存，以及至少 1 块 12GB 显存的 NVIDIA GPU（如 RTX 3080/4090 或 A6000）。在纯 CPU 环境下也可运行，但训练 100K step 可能耗时 5-8 小时；使用 GPU 可将训练时间压缩到 1 小时以内。请预留 15GB 以上磁盘空间用于 `data/rl_training/` 日志与模型检查点。
 
 ### 目标与收益
 - 让 ReAct Agent 通过 Stable Baselines3 PPO 离线自我改进，减少人工 prompt 调参
