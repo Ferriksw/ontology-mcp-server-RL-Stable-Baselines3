@@ -1120,6 +1120,22 @@ test_shacl_validation_detects_violations PASSED ✅
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 提交 Pull Request
 
+## 📖 Citation
+
+如果该项目在您的研究或产品中发挥了作用，请引用下方条目以致谢：
+
+```
+@software{ontology_rl_commerce_agent_2025,
+  author  = {Shark8848},
+  title   = {Ontology RL Commerce Agent},
+  year    = {2025},
+  url     = {https://github.com/shark8848/ontology-mcp-server-RL-Stable-Baselines3},
+  version = {v1.2.3}
+}
+```
+
+也欢迎在论文或博客中附上项目主页链接，帮助更多开发者发现并复现本体 + RL 电商 Agent 的完整闭环方案。
+
 ## 📄 许可证
 
 本项目采用 MIT 许可证
