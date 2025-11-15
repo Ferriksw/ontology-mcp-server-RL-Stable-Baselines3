@@ -911,15 +911,28 @@ def clear_conversation():
 with gr.Blocks(
     title="Agent 运行日志 UI",
     css="""
-    /* Tab 内容区域自动填充剩余高度 */
+    /* 允许页面高度超过首屏并启用滚动 */
+    html, body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto !important;
+    }
     .gradio-container {
-        height: 100vh;
+        min-height: 100vh;
+        height: auto;
         display: flex;
         flex-direction: column;
     }
+    .main-layout-row {
+        gap: 16px;
+    }
+    .left-panel,
+    .right-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
     .tab-content {
-        flex: 1;
-        overflow-y: auto;
         padding: 10px;
     }
     .quick-phrase-btn {
@@ -931,9 +944,9 @@ with gr.Blocks(
 ) as demo:
     gr.Markdown(f"# Ontology Reasoner MCP Server (Deepseek-Compatible)\n**ChromaDB 持久化记忆** (会话: `{SESSION_ID[:12]}...`)")
     
-    with gr.Row(equal_height=True):
+    with gr.Row(equal_height=False, elem_classes="main-layout-row"):
         # 左侧: 聊天区域
-        with gr.Column(scale=3):
+        with gr.Column(scale=3, elem_classes="left-panel"):
             chatbot = gr.Chatbot(elem_id="mcp_chat", label="对话历史", height=600)
             
             # 🎯 便捷测试短语区域 - 10个快捷按钮
@@ -957,7 +970,7 @@ with gr.Blocks(
             submit = gr.Button("发送", variant="primary")
             
         # 右侧: Tab 页切换 (包含所有辅助信息)
-        with gr.Column(scale=2):
+        with gr.Column(scale=2, elem_classes="right-panel"):
             with gr.Tabs():
                 with gr.TabItem("📋 Plan / Tasks"):
                     plan_md = gr.Markdown("## 📋 Plan / Tasks\n\n> *暂无计划记录*", elem_id="plan_panel", elem_classes="tab-content")

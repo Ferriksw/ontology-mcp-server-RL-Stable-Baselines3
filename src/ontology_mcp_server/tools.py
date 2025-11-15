@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 import traceback
 from decimal import Decimal
+import re
 from typing import Any, Dict, List, Tuple
 
 from .capabilities import capability_names
@@ -44,6 +45,33 @@ def _log_tool_call(name: str, input_data: Any, output_data: Any, err: str | None
     }
     tool_call_log.append(entry)
     logger.info("工具调用: %s input=%s error=%s", name, str(input_data)[:200], bool(err))
+
+
+_MAX_SQLITE_INT = 2**63 - 1
+_ORDER_NUM_PATTERN = re.compile(r"(\d+)")
+
+
+def _parse_order_id(raw: Any) -> int:
+    """Normalize order id strings (e.g., ORD123...) and guard against overflow."""
+    if raw is None:
+        raise ValueError("order_id 不能为空")
+
+    raw_str = str(raw).strip().upper()
+    match = _ORDER_NUM_PATTERN.search(raw_str)
+    if not match:
+        raise ValueError("order_id 格式无效，请提供有效的数字编号或 ORD 前缀编号")
+
+    digits = match.group(1)
+    if len(digits) > 19 or (len(digits) == 19 and digits > str(_MAX_SQLITE_INT)):
+        raise ValueError(
+            "order_id 超出系统支持范围，请确认订单号是否正确后再试"
+        )
+
+    order_id = int(digits)
+    if order_id <= 0:
+        raise ValueError("order_id 必须是正整数")
+
+    return order_id
 
 
 def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
@@ -171,12 +199,12 @@ def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
             return True, result
 
         if name == "commerce.get_order_detail":
-            result = commerce.get_order_detail(int(payload.get("order_id")))
+            result = commerce.get_order_detail(_parse_order_id(payload.get("order_id")))
             _log_tool_call(name, payload, result)
             return True, result
 
         if name == "commerce.cancel_order":
-            result = commerce.cancel_order(int(payload.get("order_id")))
+            result = commerce.cancel_order(_parse_order_id(payload.get("order_id")))
             _log_tool_call(name, payload, result)
             return True, result
 
@@ -190,7 +218,7 @@ def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
 
         if name == "commerce.process_payment":
             result = commerce.process_payment(
-                order_id=int(payload.get("order_id")),
+                order_id=_parse_order_id(payload.get("order_id")),
                 payment_method=str(payload.get("payment_method", "")),
                 amount=Decimal(str(payload.get("amount", 0))),
             )
@@ -203,7 +231,7 @@ def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
             return True, result
 
         if name == "commerce.get_shipment_status":
-            result = commerce.get_shipment_status(int(payload.get("order_id")))
+            result = commerce.get_shipment_status(_parse_order_id(payload.get("order_id")))
             _log_tool_call(name, payload, result)
             return True, result
 
@@ -212,7 +240,11 @@ def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
                 user_id=int(payload.get("user_id")),
                 subject=str(payload.get("subject", "")),
                 description=str(payload.get("description", "")),
-                order_id=(int(payload["order_id"]) if payload.get("order_id") is not None else None),
+                order_id=(
+                    _parse_order_id(payload.get("order_id"))
+                    if payload.get("order_id") is not None
+                    else None
+                ),
                 category=str(payload.get("category", "售后")),
                 priority=str(payload.get("priority", "medium")),
                 initial_message=payload.get("initial_message"),
@@ -222,7 +254,7 @@ def call_tool(name: str, payload: Dict[str, Any]) -> Tuple[bool, Any]:
 
         if name == "commerce.process_return":
             result = commerce.process_return(
-                order_id=int(payload.get("order_id")),
+                order_id=_parse_order_id(payload.get("order_id")),
                 user_id=int(payload.get("user_id")),
                 return_type=str(payload.get("return_type", "return")),
                 reason=str(payload.get("reason", "")),

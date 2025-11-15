@@ -1,14 +1,158 @@
 {
   "Smartphone": {
     "uri": "http://example.com/commerce#Smartphone",
-    "synonyms": ["smartphone", "phone", "mobile phone", "cellphone", "智能手机", "手机"]
+    "synonyms": [
+      "smartphone",
+      "phone",
+      "mobile phone",
+      "cellphone",
+      "智能手机",
+      "手机",
+      "iphone",
+      "apple phone",
+      "samsung galaxy",
+      "galaxy phone",
+      "pixel phone",
+      "xiaomi phone",
+      "oneplus phone",
+      "华为手机",
+      "荣耀手机"
+    ]
   },
   "Laptop": {
     "uri": "http://example.com/commerce#Laptop",
-    "synonyms": ["laptop", "notebook", "ultrabook", "笔记本"]
+    "synonyms": [
+      "laptop",
+      "notebook",
+      "ultrabook",
+      "笔记本",
+      "macbook",
+      "macbook pro",
+      "thinkpad",
+      "surface laptop",
+      "dell xps",
+      "gaming laptop",
+      "轻薄本"
+    ]
   },
   "Headphones": {
     "uri": "http://example.com/commerce#Headphones",
-    "synonyms": ["headphones", "earphones", "earbuds", "耳机"]
+    "synonyms": [
+      "headphones",
+      "earphones",
+      "earbuds",
+      "耳机",
+      "airpods",
+      "airpods pro",
+      "bose quietcomfort",
+      "sony wh-1000xm5",
+      "beats",
+      "降噪耳机"
+    ]
+  },
+  "AppleIPhone": {
+    "uri": "http://example.com/commerce#Smartphone",
+    "synonyms": [
+      "iphone",
+      "apple iphone",
+      "iphone 15",
+      "iphone15",
+      "iphone手机",
+      "苹果手机",
+      "苹果14",
+      "苹果15"
+    ]
+  },
+  "SamsungGalaxy": {
+    "uri": "http://example.com/commerce#Smartphone",
+    "synonyms": [
+      "samsung galaxy",
+      "galaxy s",
+      "galaxy s24",
+      "galaxy手机",
+      "三星手机",
+      "三星s24"
+    ]
+  },
+  "GooglePixel": {
+    "uri": "http://example.com/commerce#Smartphone",
+    "synonyms": [
+      "google pixel",
+      "pixel",
+      "pixel 9",
+      "pixel手机",
+      "谷歌手机"
+    ]
+  },
+  "AppleMacBook": {
+    "uri": "http://example.com/commerce#Laptop",
+    "synonyms": [
+      "macbook",
+      "macbook pro",
+      "macbook air",
+      "macbook笔记本",
+      "苹果笔记本"
+    ]
+  },
+  "LenovoThinkPad": {
+    "uri": "http://example.com/commerce#Laptop",
+    "synonyms": [
+      "thinkpad",
+      "thinkpad x1",
+      "thinkpad笔记本",
+      "联想thinkpad",
+      "联想笔记本"
+    ]
+  },
+  "DellXPS": {
+    "uri": "http://example.com/commerce#Laptop",
+    "synonyms": [
+      "dell xps",
+      "xps 13",
+      "xps 15",
+      "xps笔记本",
+      "戴尔xps"
+    ]
+  },
+  "MicrosoftSurface": {
+    "uri": "http://example.com/commerce#Laptop",
+    "synonyms": [
+      "surface laptop",
+      "surface pro",
+      "surface",
+      "surface平板",
+      "微软surface"
+    ]
+  },
+  "AppleAirPods": {
+    "uri": "http://example.com/commerce#Headphones",
+    "synonyms": [
+      "airpods",
+      "airpods pro",
+      "apple airpods",
+      "apple耳机",
+      "苹果耳机"
+    ]
+  },
+  "BoseQuietComfort": {
+    "uri": "http://example.com/commerce#Headphones",
+    "synonyms": [
+      "bose quietcomfort",
+      "bose qc",
+      "qc45",
+      "bose耳机",
+      "博士耳机"
+    ]
+  },
+  "SonyWH1000XM": {
+    "uri": "http://example.com/commerce#Headphones",
+    "synonyms": [
+      "sony wh-1000xm5",
+      "sony wh1000xm5",
+      "sony wh-1000xm4",
+      "sony xm5",
+      "sony降噪耳机",
+      "索尼耳机"
+    ]
   }
 }

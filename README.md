@@ -1110,6 +1110,7 @@ test_shacl_validation_detects_violations PASSED ✅
 **主要更新**:
 - 🏷️ 项目正式启用 **Ontology RL Commerce Agent** 名称，并在首页说明沿用原名 Ontology MCP Server 的原因与 RL 升级背景
 - 🙏 “致谢”模块补充 Stable Baselines3/Gymnasium/TensorBoard 等强化学习训练栈，并对核心依赖逐一标注作用
+- 🛡️ 工具层新增 `order_id` 合法性校验，自动识别 `ORD...` 编号并拦截超出 SQLite 支持范围的超大整数，避免 RL 场景触发 `OverflowError`
 
 **影响**:
 - 读者在文档开头即可理解项目定位与命名演进
