@@ -118,7 +118,7 @@ ontology-rl-commerce-agent/
 ```bash
 # 克隆仓库
 git clone <repository-url>
-cd ontology-mcp-server
+cd ontology-mcp-server-RL-Stable-Baselines3
 
 # 创建虚拟环境
 python3 -m venv .venv
