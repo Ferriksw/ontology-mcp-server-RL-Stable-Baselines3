@@ -49,6 +49,7 @@ ontology-rl-commerce-agent/
 │   ├── product_synonyms.json # 商品同义词词库
 │   ├── capabilities.jsonld   # 21 个工具能力描述
 │   ├── ecommerce.db          # SQLite 电商数据库
+│   ├── training_dashboard/   # RL 控制台语料缓存 & 模型注册目录
 │   ├── training_scenarios/   # RL 语料 (sample_dialogues.json)
 │   ├── rl_training/          # RL 训练输出（模型/日志/检查点）
 │   └── chroma_memory/        # ChromaDB 对话记忆向量库
@@ -73,6 +74,14 @@ ontology-rl-commerce-agent/
 │   │   ├── db_service.py     # 数据库操作封装
 │   │   └── ecommerce_ontology.py # 本体推理引擎
 │   │
+│   ├── training_dashboard/   # RL 训练控制台（Gradio + 调度）
+│   │   ├── config.py         # YAML 配置解析
+│   │   ├── corpus_manager.py # 静态/日志语料聚合与调度
+│   │   ├── training_runner.py# train_rl_agent.py 子进程管理
+│   │   ├── model_registry.py # 模型版本登记与元数据
+│   │   ├── agent_loader.py   # 一键推送模型到在线 Agent
+│   │   └── gradio_dashboard.py# UI 构建与实时指标/日志展示
+│   │
 │   └── agent/                # LangChain + RL Agent
 │       ├── gradio_ui.py      # Gradio 可视化界面 (端口 7860)
 │       ├── react_agent.py    # ReAct Agent 入口
@@ -93,13 +102,15 @@ ontology-rl-commerce-agent/
 │           ├── ppo_trainer.py        # 训练编排
 │           └── __init__.py
 │
+├── config/                   # YAML 配置（含 training_dashboard.example.yaml）
+│
 ├── tests/                    # Pytest 套件（核心/Agent/RL）
 │   ├── test_commerce_service.py
 │   ├── test_services.py
 │   ├── test_user_context.py
 │   └── ...
 │
-└── data/logs/, src/agent/logs/, src/ontology_mcp_server/logs/ 用于运行期日志与调试
+└── data/logs/, src/agent/logs/, src/ontology_mcp_server/logs/、data/training_dashboard/log_corpus/ 用于运行期日志与调试
 ```
 
 ## 🚀 快速开始
