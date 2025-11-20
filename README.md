@@ -572,6 +572,11 @@ curl -X POST http://localhost:8000/invoke \
 ```bash
 source .venv/bin/activate
 export ONTOLOGY_DATA_DIR="$(pwd)/data"
+export MCP_BASE_URL="http://localhost:8000"        # 指向正在运行的 MCP Server
+export OPENAI_API_URL="https://api.deepseek.com/v1"
+export OPENAI_API_KEY="your-api-key"
+export OPENAI_MODEL="deepseek-chat"
+export TRAIN_DEVICE="gpu"                           # 如需强制 CPU 可改为 cpu
 python test_rl_modules.py                # 训练前自检
 python train_rl_agent.py \
   --timesteps 100000 \
@@ -579,7 +584,8 @@ python train_rl_agent.py \
   --checkpoint-freq 20000 \
   --output-dir data/rl_training \
   --max-steps-per-episode 12 \
-  --scenario-file data/training_scenarios/sample_dialogues.json
+  --scenario-file data/training_scenarios/sample_dialogues.json \
+  --device "${TRAIN_DEVICE:-gpu}"
 ```
 训练日志实时写入 `data/rl_training/logs/tensorboard/`，可通过 `tensorboard --logdir data/rl_training/logs/tensorboard` 观察奖励、loss、评估曲线。
 
