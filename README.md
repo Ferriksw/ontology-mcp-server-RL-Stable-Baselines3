@@ -281,6 +281,23 @@ export OLLAMA_API_KEY="ollama"
 #   ollama run qwen3:8b --keepalive 5m
 ```
 
+### 3.1 配置 MCP 服务地址
+
+训练脚本 (`train_rl_agent.py`) 与 Gradio Agent 都通过 HTTP 调用 MCP Server；其地址由 `MCP_BASE_URL` 控制，默认指向 `http://localhost:8000`。你可以通过以下任意方式覆盖：
+
+```bash
+# 本地/开发环境
+export MCP_BASE_URL="http://127.0.0.1:8000"
+
+# Docker Compose / 生产环境（容器间通信）
+export MCP_BASE_URL="http://ontology-mcp-server:8000"
+
+# 或在 src/agent/config.yaml 中设置：
+# MCP_BASE_URL: http://localhost:8000
+```
+
+无论是直接运行 `python train_rl_agent.py` 还是使用训练控制台，都会读取同一变量，因此确保该地址能够访问正在运行的 MCP Server。
+
 ### 4. 启动服务
 
 **方式一：使用脚本（推荐）**
