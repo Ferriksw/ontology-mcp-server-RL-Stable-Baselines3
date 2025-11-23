@@ -4,43 +4,9 @@
 
 🤖 **强化学习驱动的 Agent**：项目内置 Stable Baselines3 PPO 训练管线，从 **数据 → 训练 → 评估 → 部署** 完整闭环出发，支持 Agent 在真实语料与工具调用日志上持续自我迭代，自动学会更高效、更安全的工具编排策略。
 
-### 4. 启动服务
 
-**方式一：一键后台启动（推荐）**
 
-```bash
-# 后台启动 Server / Agent / Training Dashboard / TensorBoard
-./scripts/start_all.sh
-
-# 实时查看任一服务日志
-tail -f logs/server_*.log
-```
-
-- 所有脚本采用 `nohup` + 后台模式运行，并将输出写入 `logs/<service>_yyyyMMdd_HHmmss>.log`。
-- `LOG_DIR` 环境变量可自定义日志目录（默认 `logs/`）。
-- 进程信息会记录在 `logs/processes.pid`，便于统一停止。
-- 一键停止全部服务：
-
-```bash
-./scripts/stop_all.sh
-```
-
-`stop_all.sh` 会遍历 `processes.pid` 中的 PID，先尝试优雅退出，必要时发送 `SIGKILL`，最后清空 PID 文件。
-
-**方式二：分别启动（便于独立调试）**
-- ✅ **Phase 1**: 数据库 ORM 层 (12表 + SQLAlchemy ORM)
-- ✅ **Phase 2**: 电商本体层 (650行本体 + 550行 SHACL 规则 + 5推理方法)
-# 终端 1: MCP 服务器（日志写入 logs/server_*.log）
-- ✅ **Phase 4**: Agent 对话优化 (系统提示词 + 8阶段状态跟踪 + 质量评分 + 意图识别 + 推荐引擎)
-- ✅ **Phase 5**: Gradio 电商 UI (5 Tab 可视化界面 + 实时分析面板)
-# 终端 2: Gradio UI（日志写入 logs/agent_*.log）
 ## 📁 目录结构
-
-# 终端 3: RL 训练控制台（Gradio）
-./scripts/run_training_dashboard.sh
-
-# 终端 4: TensorBoard（默认端口 6006，可用 TB_PORT 覆盖）
-./scripts/run_tensorboard.sh
 
 ```
 ontology-rl-commerce-agent/
@@ -321,15 +287,37 @@ export MCP_BASE_URL="http://ontology-mcp-server:8000"
 
 ### 4. 启动服务
 
-**方式一：使用脚本（推荐）**
+**方式一：一键后台启动（推荐）**
 
 ```bash
-# 终端 1: 启动 MCP 服务器 (端口 8000)
-./scripts/run_server.sh
+# 后台启动 Server / Agent / Training Dashboard / TensorBoard
+./scripts/start_all.sh
 
-# 终端 2: 启动 Gradio UI (端口 7860)
-./scripts/run_agent.sh
+# 实时查看任一服务日志
+tail -f logs/server_*.log
 ```
+
+- 所有脚本采用 `nohup` + 后台模式运行，并将输出写入 `logs/<service>_yyyyMMdd_HHmmss>.log`。
+- `LOG_DIR` 环境变量可自定义日志目录（默认 `logs/`）。
+- 进程信息会记录在 `logs/processes.pid`，便于统一停止。
+- 一键停止全部服务：
+
+```bash
+./scripts/stop_all.sh
+```
+
+`stop_all.sh` 会遍历 `processes.pid` 中的 PID，先尝试优雅退出，必要时发送 `SIGKILL`，最后清空 PID 文件。
+
+**方式二：分别启动（便于独立调试）**
+
+# 终端 1: MCP 服务器（日志写入 logs/server_*.log）
+./scripts/run_server.sh
+# 终端 2: Gradio UI（日志写入 logs/agent_*.log）
+./scripts/run_agent.sh
+# 终端 3: RL 训练控制台（Gradio）
+./scripts/run_training_dashboard.sh
+# 终端 4: TensorBoard（默认端口 6006，可用 TB_PORT 覆盖）
+./scripts/run_tensorboard.sh
 
 **方式三：手动启动**
 
