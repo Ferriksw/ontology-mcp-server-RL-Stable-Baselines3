@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import atexit
 import json
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import gradio as gr
@@ -77,6 +78,52 @@ def build_dashboard(config: Optional[TrainingDashboardConfig] = None) -> gr.Bloc
         static_table = _summaries_to_table(corpus_manager.list_static_corpus())
         log_table = _summaries_to_table(corpus_manager.list_log_corpus())
         return static_table, log_table
+
+    def _load_corpus_preview(path_str: str) -> Tuple[str, List[List[str]], Dict]:
+        if not path_str:
+            raise gr.Error("请选择一条语料")
+        path = Path(path_str)
+        if not path.exists():
+            raise gr.Error(f"语料文件不存在: {path}")
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception as exc:
+            raise gr.Error(f"解析语料失败: {exc}")
+        info = [
+            f"**文件**: {path.name}",
+            f"**场景数**: {len(data.get('scenarios', []))}",
+            f"**描述**: {data.get('description') or data.get('source', '未提供')}",
+            f"**路径**: {path}",
+        ]
+        info_md = "\n".join(info)
+        table_rows: List[List[str]] = []
+        for scenario in data.get("scenarios", []):
+            name = scenario.get("name", "未知")
+            category = scenario.get("category", "N/A")
+            persona = scenario.get("persona", "")
+            steps = scenario.get("steps", [])
+            preview_lines = []
+            for step in steps:
+                role = step.get("role", "?")
+                content = step.get("content", "")
+                preview_lines.append(f"[{role}] {content}")
+            preview = "\n".join(preview_lines)
+            table_rows.append([name, category, persona, preview])
+        return info_md, table_rows, data
+
+    def preview_static(idx: int):
+        entries = corpus_manager.list_static_corpus()
+        if idx is None or idx < 0 or idx >= len(entries):
+            raise gr.Error("请选择有效的静态语料")
+        return _load_corpus_preview(str(entries[idx].path))
+
+    def preview_log(idx: int):
+        entries = corpus_manager.list_log_corpus()
+        if not entries:
+            raise gr.Error("暂无日志语料")
+        if idx is None or idx < 0 or idx >= len(entries):
+            raise gr.Error("请选择有效的日志语料")
+        return _load_corpus_preview(str(entries[idx].path))
 
     def ingest_logs_manual() -> str:
         path = corpus_manager.ingest_logs_once()
@@ -168,14 +215,60 @@ def build_dashboard(config: Optional[TrainingDashboardConfig] = None) -> gr.Bloc
             stop_btn.click(stop_training, outputs=stop_result)
 
         with gr.Tab("语料管理"):
-            ingest_info = gr.Markdown("日志提炼任务按配置自动运行，也可手动触发。")
-            static_table = gr.Dataframe(headers=["文件", "场景数", "类型", "路径"], interactive=False)
-            log_table = gr.Dataframe(headers=["文件", "场景数", "类型", "路径"], interactive=False)
+            ingest_info = gr.Markdown("日志提炼任务按配置自动运行，也可手动触发。点击语料行可预览内容。")
+            static_table = gr.Dataframe(headers=["文件", "场景数", "类型", "路径"], interactive=False, label="静态语料")
+            log_table = gr.Dataframe(headers=["文件", "场景数", "类型", "路径"], interactive=False, label="日志语料")
             refresh_corpus_btn = gr.Button("刷新语料列表")
             refresh_corpus_btn.click(refresh_corpus_tables, outputs=[static_table, log_table])
             ingest_btn = gr.Button("手动提炼日志")
             ingest_result = gr.Markdown()
             ingest_btn.click(ingest_logs_manual, outputs=ingest_result)
+
+            preview_overlay = gr.Group(visible=False)
+            with preview_overlay:
+                gr.Markdown("### 语料预览")
+                preview_desc = gr.Markdown("请选择语料")
+                preview_table = gr.Dataframe(
+                    headers=["名称", "分类", "Persona", "片段"],
+                    interactive=False,
+                    wrap=True,
+                )
+                preview_json = gr.JSON(label="完整语料 JSON")
+                close_btn = gr.Button("关闭预览", variant="secondary")
+                close_btn.click(lambda: gr.update(visible=False), outputs=preview_overlay)
+
+            def _preview_static_select(evt: gr.SelectData):
+                idx = evt.index
+                if isinstance(idx, (list, tuple)):
+                    idx = idx[0]
+                desc, rows, payload = preview_static(int(idx))
+                return (
+                    gr.update(visible=True),
+                    gr.update(value=desc),
+                    gr.update(value=rows or [["-", "-", "-", "(无内容)"]]),
+                    gr.update(value=payload),
+                )
+
+            def _preview_log_select(evt: gr.SelectData):
+                idx = evt.index
+                if isinstance(idx, (list, tuple)):
+                    idx = idx[0]
+                desc, rows, payload = preview_log(int(idx))
+                return (
+                    gr.update(visible=True),
+                    gr.update(value=desc),
+                    gr.update(value=rows or [["-", "-", "-", "(无内容)"]]),
+                    gr.update(value=payload),
+                )
+
+            static_table.select(
+                _preview_static_select,
+                outputs=[preview_overlay, preview_desc, preview_table, preview_json],
+            )
+            log_table.select(
+                _preview_log_select,
+                outputs=[preview_overlay, preview_desc, preview_table, preview_json],
+            )
 
         with gr.Tab("训练控制"):
             with gr.Row():
