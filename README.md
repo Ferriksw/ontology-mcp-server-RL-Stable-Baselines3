@@ -344,7 +344,7 @@ source .venv/bin/activate
 tensorboard --logdir data/rl_training/logs/tensorboard --host 0.0.0.0 --port 6006
 ```
 
-> 如果需要在手动模式下指定 Gradio 监听地址/端口，可提前设置 `GRADIO_SERVER_NAME=0.0.0.0`、`GRADIO_SERVER_PORT=7860`（Agent UI）以及 `TRAINING_DASHBOARD_PORT=7861` 等环境变量，然后再运行对应脚本。
+> 如果需要在手动模式下指定 Gradio 监听地址/端口，可在运行脚本前设置 `GRADIO_SERVER_NAME=0.0.0.0` 并调整 `GRADIO_SERVER_PORT`（先启动 Agent 可设 7860，启动训练看板前再改 7861 等），Gradio 会自动读取这些环境变量。
 
 ### 5. 访问界面
 
@@ -962,36 +962,59 @@ python train_rl_agent.py --timesteps 20000 --eval-freq 2000 --checkpoint-freq 50
 
 ### 环境变量
 
-**MCP Server**:
+以下变量可直接 `export`，脚本与服务会自动读取：
+
+**MCP Server / 数据目录**
 ```bash
-ONTOLOGY_DATA_DIR=/path/to/data    # 数据目录（必需）
-APP_HOST=0.0.0.0                   # 服务器地址
-APP_PORT=8000                      # 服务器端口
-ONTOLOGY_USE_OWLREADY2=false       # 是否使用 Owlready2 推理
+export ONTOLOGY_DATA_DIR="$(pwd)/data"   # 必填：数据库、本体、语料路径
+export APP_HOST=0.0.0.0                   # uvicorn 监听地址
+export APP_PORT=8000                      # uvicorn 端口
+export ONTOLOGY_USE_OWLREADY2=false       # 是否启用 Owlready2 推理
 ```
 
-**Agent & LLM**:
+**Agent & LLM**
 ```bash
-OPENAI_API_URL=https://api.deepseek.com/v1  # LLM API 地址
-OPENAI_API_KEY=your-api-key              # API 密钥
-OPENAI_MODEL=deepseek-chat               # 模型名称
-MCP_BASE_URL=http://localhost:8000       # MCP 服务器地址
-LLM_PROVIDER=deepseek                    # deepseek | ollama
+export MCP_BASE_URL="http://127.0.0.1:8000"   # Agent / 训练脚本访问 MCP Server
+export OPENAI_API_URL="https://api.deepseek.com/v1"
+export OPENAI_API_KEY="your-api-key"
+export OPENAI_MODEL="deepseek-chat"
+export LLM_PROVIDER="deepseek"               # 可切换为 ollama
 
 # 使用本地 Ollama 时
-LLM_PROVIDER=ollama
-OLLAMA_API_URL=http://localhost:11434/v1
-OLLAMA_MODEL=qwen3:8b
-OLLAMA_API_KEY=ollama
+export LLM_PROVIDER="ollama"
+export OLLAMA_API_URL="http://localhost:11434/v1"
+export OLLAMA_MODEL="qwen3:8b"
+export OLLAMA_API_KEY="ollama"               # Ollama 不校验密钥
 ```
 
-**记忆系统**:
+**Gradio / 可视化服务**
 ```bash
-MEMORY_BACKEND=chromadb            # 记忆后端 (chromadb/simple)
-  provider: "deepseek"            # 或 "ollama"
-  api_url: "https://api.deepseek.com/v1"
-  api_key: "${OPENAI_API_KEY}"
-  model: "deepseek-chat"
+export GRADIO_SERVER_NAME=0.0.0.0            # 适用于所有 Gradio launch()
+export GRADIO_SERVER_PORT=7860               # 启动 Agent UI 前设置
+# 若需不同端口，可在启动训练看板前改为 7861，再运行 scripts/run_training_dashboard.py
+
+export LOG_DIR="$(pwd)/logs"                # start_all.sh / run_*.sh 日志目录
+export TB_LOG_DIR="$(pwd)/data/rl_training/logs/tensorboard"  # TensorBoard logdir
+export TB_HOST=0.0.0.0
+export TB_PORT=6006
+```
+
+**强化学习训练辅助（可选）**
+```bash
+# 结合 shell 展开方便复用，例如: python train_rl_agent.py --device "${TRAIN_DEVICE:-gpu}"
+export TRAIN_DEVICE=gpu              # gpu | cpu，用于 CLI 示例提前约定默认值
+export RL_OUTPUT_DIR="$(pwd)/data/rl_training"  # 自定义训练输出目录
+```
+
+**记忆系统**
+```bash
+export MEMORY_ENABLED=true
+export MEMORY_BACKEND=chromadb       # chromadb | basic
+export CHROMA_PERSIST_DIR="data/chroma_memory"
+export MEMORY_RETRIEVAL_MODE=recent  # recent | similarity
+export MEMORY_MAX_TURNS=10           # recent 模式的窗口大小
+```
+
 ### config.yaml 配置
 
 
