@@ -1337,6 +1337,11 @@ Agent引导: 通用说明 → 场景化指导 (正确率+60%)
 - 📄 预览面板展示完整场景列表与全部对话步骤，确保任何语料都能一次性审阅
 - 🧾 新增 JSON 视图同步渲染原始语料文件，方便滚动检查字段与元数据
 
+**⚙️ 启动脚本配置增强**
+- 🌐 `run_agent.sh` / `run_training_dashboard.sh` 增加 `AGENT_HOST/AGENT_PORT` 与 `TRAINING_DASHBOARD_HOST/TRAINING_DASHBOARD_PORT`，默认自动映射至 Gradio `SERVER_NAME/PORT`
+- 🧵 脚本启动日志会展示具体监听地址，便于确认多实例场景下的端口占用
+- 📚 README“Gradio/可视化服务”章节同步补充变量说明，指导如何在启动前单独配置两个界面
+
 ### 2025-11-20
 
 **🎯 训练环境增强**
